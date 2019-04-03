@@ -1,0 +1,76 @@
+https://github.com/serilog/serilog
+
+Like many other libraries for .NET, Serilog provides diagnostic logging to files, the console, and many other outputs.
+
+var log = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("log.txt")
+    .CreateLogger();
+
+log.Information("Hello, Serilog!");
+Unlike other logging libraries, Serilog is built from the ground up to record structured event data.
+
+var position = new { Latitude = 25, Longitude = 134 };
+var elapsedMs = 34;
+
+log.Information("Processed {@Position} in {Elapsed} ms.", position, elapsedMs);
+Serilog uses message templates, a simple DSL that extends .NET format strings with named as well as positional parameters. Instead of formatting events immediately into text, Serilog captures the values associated with each named parameter.
+
+The example above records two properties, Position and Elapsed, in the log event. The @ operator in front of Position tells Serilog to serialize the object passed in, rather than convert it using ToString(). Serilog's deep and rich support for structured event data opens up a huge range of diagnostic possibilities not available when using traditional loggers.
+
+Rendered into JSON format for example, these properties appear alongside the timestamp, level, and message like:
+
+{"Position": {"Latitude": 25, "Longitude": 134}, "Elapsed": 34}
+Back-ends that are capable of recording structured event data make log searches and analysis possible without log parsing or regular expressions.
+
+Supporting structured data doesn't mean giving up text: when Serilog writes events to files or the console, the template and properties are rendered into friendly human-readable text just like a traditional logging library would produce:
+
+09:14:22 [INF] Processed { Latitude: 25, Longitude: 134 } in 34 ms.
+
+
+
+
+=======================================================================
+using Serilog;
+
+public class Program
+{
+    public static void Main()
+    {
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.Console()
+            .WriteTo.File("log.txt",
+                rollingInterval: RollingInterval.Day,
+                rollOnFileSizeLimit: true)
+            .CreateLogger();
+            
+        Log.Information("Hello, Serilog!");
+        
+        Log.CloseAndFlush();
+    }
+}
+
+======================================================================
+
+LoggerConfiguration config = new LoggerConfiguration();
+config.WriteTo.Console();
+config.WriteTo.File(@"D:\log.txt", rollingInterval: RollingInterval.Minute);
+//config.MinimumLevel.Error();
+
+Logger log = config.CreateLogger();
+
+Log.Logger = log; //赋值给全局
+
+log.Debug("你好");
+log.Information("你好");
+log.Warning("你好");
+log.Error("你好");
+log.Fatal("鸟");
+
+Log.Error("这样也行的"); //全局使用
+
+log.Dispose();
+
+Log.CloseAndFlush(); //全局关闭
+Console.ReadKey();
