@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Web;
 using Serilog;
 using Serilog.Core;
@@ -10,9 +11,18 @@ namespace ServerWeb.AppCode
 
         private static Logger _logger;
 
-        public static void Start()
+        public static void Start(bool web = true)
         {
-            var file = HttpContext.Current.Server.MapPath("~/log/log.txt");
+            string file;
+            if (web)
+            {
+                file = HttpContext.Current.Server.MapPath("~/log/log.txt");
+            }
+            else
+            {
+                file = AppDomain.CurrentDomain.BaseDirectory + @"log\log.txt";
+            }
+
             var config = new LoggerConfiguration();
             //config.WriteTo.Console();
             config.WriteTo.File(file, rollingInterval: RollingInterval.Day);
@@ -76,7 +86,7 @@ namespace ServerWeb.AppCode
                 }
 
                 //对于路径错误不记录日志，并都以自定义404页面响应
-                if (ex.TargetSite.ReflectedType == typeof (System.IO.Path))
+                if (ex.TargetSite.ReflectedType == typeof(System.IO.Path))
                 {
                     HttpContext.Current.Response.StatusCode = 404;
                     //Server.ClearError();
