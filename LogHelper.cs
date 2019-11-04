@@ -4,7 +4,7 @@ using System.Web;
 using Serilog;
 using Serilog.Core;
 
-namespace ServerWeb.AppCode
+namespace CommonWeb.AppCode
 {
     public class LogHelper
     {
@@ -13,16 +13,7 @@ namespace ServerWeb.AppCode
 
         public static void Start(bool web = true)
         {
-            string file;
-            if (web)
-            {
-                file = HttpContext.Current.Server.MapPath("~/log/log.txt");
-            }
-            else
-            {
-                file = AppDomain.CurrentDomain.BaseDirectory + @"log\log.txt";
-            }
-
+            string file= AppDomain.CurrentDomain.BaseDirectory + @"log\log.txt";
             var config = new LoggerConfiguration();
             //config.WriteTo.Console();
             config.WriteTo.File(file, rollingInterval: RollingInterval.Day);
