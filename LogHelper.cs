@@ -11,13 +11,13 @@ namespace CommonWeb.AppCode
 
         private static Logger _logger;
 
-        public static void Start(bool web = true)
+        public static void Start()
         {
-            string file= AppDomain.CurrentDomain.BaseDirectory + @"log\log.txt";
+            var file= AppDomain.CurrentDomain.BaseDirectory + @"log\log-.txt";
             var config = new LoggerConfiguration();
-            //config.WriteTo.Console();
-            config.WriteTo.File(file, rollingInterval: RollingInterval.Day);
-            //config.MinimumLevel.Error();
+            config.WriteTo.Console();
+            config.WriteTo.File(file, rollingInterval: RollingInterval.Day, shared: true);
+            config.MinimumLevel.Debug();
             _logger = config.CreateLogger();
         }
 
